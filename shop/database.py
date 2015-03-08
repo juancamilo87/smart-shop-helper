@@ -219,7 +219,7 @@ class ShopDatabase(object):
                                 name TEXT, address TEXT UNIQUE, \
                                 latitude REAL, longitude REAL, \
                                 schedule_id INTEGER, UNIQUE(latitude, longitude), \
-                                FOREIGN KEY(schedule_id) REFERENCES schedule(schedule_id) ON DELETE CASCADE)'
+                                FOREIGN KEY(schedule_id) REFERENCES schedules(schedule_id) ON DELETE CASCADE)'
         '''
         connects (and creates if necessary) to the database. gets a
         connection object
@@ -661,7 +661,7 @@ class ShopDatabase(object):
           #SQL Statement for extracting the userid given a nickname
         query1 = 'SELECT * FROM categories \
                     WHERE category_id = ?'
-        query2 = 'INSERT INTO items(name, category_id, description)\
+        query2 = 'INSERT INTO items(name, category_id, descr_item)\
                   VALUES(?,?,?)'
        
         
