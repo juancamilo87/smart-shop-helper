@@ -3,19 +3,25 @@
 from datetime import datetime
 import time, sqlite3, sys, re, os
 
+DEFAULT_DB_PATH = 'db/shop.db'
+DEFAULT_DATA_DUMP = "db/forum_data_dump.sql"
+
 class ShopDatabase(object):
     '''
     API to access Forurm database. 
     '''
     
 
-    def __init__(self, db_path):
+    def __init__(self, db_path=None):
         '''
         db_path is the address of the path with respect to the calling script.
         If db_path is None, DEFAULT_DB_PATH is used instead.
         '''
         super(ShopDatabase, self).__init__()
-        self.db_path = db_path
+        if db_path is not None:
+            self.db_path = db_path
+        else:
+            self.db_path = DEFAULT_DB_PATH
         
 
     #Setting up the database. Used for the tests.
@@ -47,7 +53,7 @@ class ShopDatabase(object):
         con = None
         try:
             #Connects (and creates if necessary) to the database. Gets a connection object
-            con = sqlite3.connect('db_path')
+            con = sqlite3.connect(self.db_path)
             #Get the cursor object. It allows to execute SQL code and traverse the result set
             cur = con.cursor()   
             #Execute the pragma command
@@ -80,7 +86,7 @@ class ShopDatabase(object):
         connects (and creates if necessary) to the database. gets a
         connection object
         '''
-        con = sqlite3.connect('shop.db')
+        con = sqlite3.connect(self.db_path)
         with con:
             '''
             get the cursor object. It allows to execute SQL code
@@ -111,7 +117,7 @@ class ShopDatabase(object):
         connects (and creates if necessary) to the database. gets a
         connection object
         '''
-        con = sqlite3.connect('shop.db')
+        con = sqlite3.connect(self.db_path)
         with con:
             '''
             get the cursor object. It allows to execute SQL code
@@ -141,7 +147,7 @@ class ShopDatabase(object):
         connects (and creates if necessary) to the database. gets a
         connection object
         '''
-        con = sqlite3.connect('shop.db')
+        con = sqlite3.connect(self.db_path)
         with con:
             '''
             get the cursor object. It allows to execute SQL code
@@ -185,7 +191,7 @@ class ShopDatabase(object):
         connects (and creates if necessary) to the database. gets a
         connection object
         '''
-        con = sqlite3.connect('shop.db')
+        con = sqlite3.connect(self.db_path)
         with con:
             '''
             get the cursor object. It allows to execute SQL code
@@ -218,7 +224,7 @@ class ShopDatabase(object):
         connects (and creates if necessary) to the database. gets a
         connection object
         '''
-        con = sqlite3.connect('shop.db')
+        con = sqlite3.connect(self.db_path)
         with con:
             '''
             get the cursor object. It allows to execute SQL code
@@ -252,7 +258,7 @@ class ShopDatabase(object):
         connects (and creates if necessary) to the database. gets a
         connection object
         '''
-        con = sqlite3.connect('shop.db')
+        con = sqlite3.connect(self.db_path)
         with con:
             '''
             get the cursor object. It allows to execute SQL code
