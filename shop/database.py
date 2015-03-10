@@ -4,7 +4,7 @@ from datetime import datetime
 import time, sqlite3, sys, re, os
 
 DEFAULT_DB_PATH = 'db/shop.db'
-DEFAULT_DATA_DUMP = "db/forum_data_dump.sql"
+DEFAULT_DATA_DUMP = "db/shop_data_dump.sql"
 
 class ShopDatabase(object):
     '''
@@ -44,6 +44,27 @@ class ShopDatabase(object):
         self.create_schedules_table()
         self.create_stores_table()
         self.create_prices_table()
+
+    def load_init_values(self):
+        '''
+        Populate the database with initial values. It creates 
+        ''' 
+        self.create_all_tables()
+        self.load_table_values_from_dump()
+
+    def load_table_values_from_dump(self, dump=None):
+        '''
+        Populate programmatically the tables from a dump file.
+        dump is the  path to the .sql dump file. If it is None,  
+        DEFAULT_DATA_DUMP is used instead.
+        '''
+        con = sqlite3.connect(self.db_path)
+        if dump is None:
+            dump = DEFAULT_DATA_DUMP
+        with open (dump) as f:
+            sql = f.read()
+            cur = con.cursor()
+            cur.executescript(sql)  
 
     #MANAGING THE CONNECTIONS:
     def check_foreign_keys_status(self):
