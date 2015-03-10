@@ -49,7 +49,7 @@ class ShopDatabase(object):
         '''
         Populate the database with initial values. It creates 
         ''' 
-        self.create_all_tables()
+        #self.create_all_tables()
         self.load_table_values_from_dump()
 
     def load_table_values_from_dump(self, dump=None):
@@ -271,7 +271,7 @@ class ShopDatabase(object):
         '''
         keys_on = 'PRAGMA foreign_keys = ON'
         stmnt = 'CREATE TABLE prices (price_id INTEGER PRIMARY KEY AUTOINCREMENT, \
-                                 value REAL, item_id INTEGER, store_id TEXT, \
+                                 value REAL, item_id INTEGER, store_id INTEGER, \
                                  timestamp INTEGER, UNIQUE(item_id, store_id), \
                                  FOREIGN KEY(item_id) REFERENCES items(item_id) ON DELETE CASCADE, \
                                  FOREIGN KEY(store_id) REFERENCES stores(store_id) ON DELETE CASCADE)'
@@ -490,8 +490,8 @@ class ShopDatabase(object):
             #Provide support for foreign keys
             cur.execute(keys_on)        
             #Execute main SQL Statement
-            pvalue = (store_id)
-            cur.execute(query, store_id)
+            pvalue = (store_id,)
+            cur.execute(query, pvalue)
             #Process the results
             row = cur.fetchone()
             if row is None:
@@ -545,8 +545,8 @@ class ShopDatabase(object):
             #Provide support for foreign keys
             cur.execute(keys_on)        
             #Execute main SQL Statement
-            pvalue = (schedule_id)
-            cur.execute(query, schedule_id)
+            pvalue = (schedule_id,)
+            cur.execute(query, pvalue)
             #Process the results
             row = cur.fetchone()
             if row is None:
@@ -559,7 +559,7 @@ class ShopDatabase(object):
         It takes a database Row and transform it into a python dictionary.
         Dictionary has the following format:
             {'id':,'monday_id':, 'tuesday_id':,'wednesday_id':,
-             'thursday_id':','friday_id':,'saturday_id':,'sunday_id':
+             'thursday_id':,'friday_id':,'saturday_id':,'sunday_id':
              }
             where:
              - id: id of the schedule
@@ -603,8 +603,8 @@ class ShopDatabase(object):
             #Provide support for foreign keys
             cur.execute(keys_on)        
             #Execute main SQL Statement
-            pvalue = (time_id)
-            cur.execute(query, time_id)
+            pvalue = (time_id,)
+            cur.execute(query, pvalue)
             #Process the results
             row = cur.fetchone()
             if row is None:
@@ -623,11 +623,11 @@ class ShopDatabase(object):
              - open: hour when it opens
              - close: hour when it closes
         '''
-        return {'id':row['row_id'],
+        return {'id':row['time_id'],
                 'open':row['open'],
                 'close':row['close']}
 
-    def create_category(self, name, description=""):
+    def create_category(self, name, description=None):
         '''
         Create a new category with the data provided as arguments. 
         INPUT:    
@@ -636,6 +636,7 @@ class ShopDatabase(object):
         OUTPUT: 
             - returns the id of the created category
         raises ShopDatabaseError if the database could not be modified.
+        raises IntegrityError if the category already exists
         '''
         
         #Create the SQL Statements
@@ -663,7 +664,7 @@ class ShopDatabase(object):
             lid = cur.lastrowid
             return lid
 
-    def create_item(self, name, category_id, descr_item=""):
+    def create_item(self, name, category_id, descr_item=None):
         '''
         Create a new item with the data provided as arguments. 
         INPUT:    
@@ -674,6 +675,7 @@ class ShopDatabase(object):
             - returns the id of the created item
         raises ShopDatabaseError if the database could not be modified.
         raises ValueError if the category does not exist
+        raises IntegrityEror if the item already exists
         '''
         
         #Create the SQL Statements
@@ -695,7 +697,7 @@ class ShopDatabase(object):
             #Provide support for foreign keys
             cur.execute(keys_on)        
 
-            pvalue = (category_id)
+            pvalue = (category_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
@@ -710,13 +712,13 @@ class ShopDatabase(object):
 
     def update_price(self, value, item_id, store_id):
         '''
-        Create a new item with the data provided as arguments. 
+        Create or update a price with the data provided as arguments. 
         INPUT:    
-            - name: the item's name
-            - category_id: the category id the item belongs to
-            - descr_item: the item's description
+            - value: the item's price
+            - item_id: the identifier of the item the price belongs to
+            - store_id: the identifier of the store the price belongs to
         OUTPUT: 
-            - returns the id of the created item
+            - returns the id of the created price
         raises ShopDatabaseError if the database could not be modified.
         raises ValueError if the item_id does not exist
         raises ValueError if the store_id does not exist
@@ -751,14 +753,14 @@ class ShopDatabase(object):
             #Provide support for foreign keys
             cur.execute(keys_on)        
 
-            pvalue = (item_id)
+            pvalue = (item_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
             if row is None:
                 raise ValueError("The item does not exist")
             
-            pvalue = (store_id)
+            pvalue = (store_id,)
             cur.execute(query2, pvalue)
 
             row = cur.fetchone()
@@ -797,6 +799,7 @@ class ShopDatabase(object):
             - returns the id of the created store
         raises ShopDatabaseError if the database could not be modified.
         raises ValueError if the schedule_id does not exist
+        raises IntegrityError if the store already exists
         '''
         
         #Create the SQL Statements
@@ -818,13 +821,14 @@ class ShopDatabase(object):
             #Provide support for foreign keys
             cur.execute(keys_on)        
 
-            pvalue = (schedule_id)
+            pvalue = (schedule_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
             if row is None:
                 raise ValueError("The schedule does not exist")
-            
+
+
             pvalue = (name, address, latitude, longitude, schedule_id)
             cur.execute(query2, pvalue)
             
@@ -852,6 +856,7 @@ class ShopDatabase(object):
         raises ValueError if the friday_id does not exist on the times table
         raises ValueError if the saturday_id does not exist on the times table
         raises ValueError if the sunday_id does not exist on the times table
+        raises IntegrityError if the schedule already exists
         '''
         
         #Create the SQL Statements
@@ -873,14 +878,14 @@ class ShopDatabase(object):
             #Provide support for foreign keys
             cur.execute(keys_on)        
 
-            pvalue = (monday_id)
+            pvalue = (monday_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
             if row is None:
                 raise ValueError("The time for monday does not exist")
 
-            pvalue = (tuesday_id)
+            pvalue = (tuesday_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
@@ -888,7 +893,7 @@ class ShopDatabase(object):
                 raise ValueError("The time for tuesday does not exist")
 
 
-            pvalue = (wednesday_id)
+            pvalue = (wednesday_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
@@ -896,7 +901,7 @@ class ShopDatabase(object):
                 raise ValueError("The time for wednesday does not exist")
 
 
-            pvalue = (thursday_id)
+            pvalue = (thursday_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
@@ -904,7 +909,7 @@ class ShopDatabase(object):
                 raise ValueError("The time for thursday does not exist")
 
 
-            pvalue = (friday_id)
+            pvalue = (friday_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
@@ -912,7 +917,7 @@ class ShopDatabase(object):
                 raise ValueError("The time for friday does not exist")
 
 
-            pvalue = (saturday_id)
+            pvalue = (saturday_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
@@ -920,7 +925,7 @@ class ShopDatabase(object):
                 raise ValueError("The time for saturday does not exist")
 
 
-            pvalue = (sunday_id)
+            pvalue = (sunday_id,)
             cur.execute(query1, pvalue)
 
             row = cur.fetchone()
@@ -942,6 +947,7 @@ class ShopDatabase(object):
         OUTPUT: 
             - returns the id of the created time
         raises ShopDatabaseError if the database could not be modified.
+        raises IntegrityError if the time already exists
         '''
         
         #Create the SQL Statements
@@ -950,7 +956,8 @@ class ShopDatabase(object):
           #SQL Statement for extracting the userid given a nickname
         query = 'INSERT INTO times(open, close)\
                   VALUES(?,?)'
-       
+
+        
         
         #Connects to the database. Gets a connection object
         con = sqlite3.connect(self.db_path)
@@ -959,12 +966,11 @@ class ShopDatabase(object):
             con.row_factory = sqlite3.Row
             cur = con.cursor()
             #Provide support for foreign keys
-            cur.execute(keys_on)        
+            cur.execute(keys_on)      
 
-            
-            
             pvalue = (p_open, p_close)
             cur.execute(query, pvalue)
             
             lid = cur.lastrowid
+
             return lid

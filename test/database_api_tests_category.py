@@ -17,18 +17,18 @@ class CategoryDbAPITestCase(BaseTestCase):
              - description: description of the category
     '''
     #the strip function removes the tabs generated.
-    category1_name = 'Mystery'
+    category1_name = 'Milk'
     category1_id = 1
-    category1_description = ''
+    category1_description = 'Categories of milk'
     category1 = {
                   'id':category1_id,
                   'name':category1_name,
                   'description':category1_description
                 }
 
-    category2_name = 'Mystery'
+    category2_name = 'Fruit'
     category2_id = 2
-    category2_description = ''
+    category2_description = 'Different kinds of fruit'
     category2 = {
                   'id':category2_id,
                   'name':category2_name,
@@ -38,19 +38,19 @@ class CategoryDbAPITestCase(BaseTestCase):
 
     categories = [category1, category2]
 
-    new_category1_name = 'sully'
-    new_category1_description = ''
+    new_category1_name = 'Chicken'
+    new_category1_description = 'Different kinds of chicken'
     new_category1 = {
                     'id':3,
                     'name':new_category1_name,
                     'description':new_category1_description
                     }
 
-    new_category2_name = 'sully'
+    new_category2_name = 'Bread'
     new_category2 = {
-                    'id':4,
-                    'name':null,
-                    'description':new_category2_description
+                    'id':3,
+                    'name':new_category2_name,
+                    'description':None
                     }
 
     initial_size = 2
@@ -119,7 +119,7 @@ class CategoryDbAPITestCase(BaseTestCase):
               self.test_get_categories.__doc__
         #Test with existing categories
         categories = db.get_categories()
-        self.assertDictContainsSubset(categories, self.categories)
+        self.assertListEqual(categories, self.categories)
 
     def test_create_category(self):
         '''
@@ -150,9 +150,9 @@ class CategoryDbAPITestCase(BaseTestCase):
             #Test the method
             new_category_name = row['name']
             new_category_description = row['description']
-            self.assertDictContainsSubset(category_id, self.new_category1['id'])
-            self.assertDictContainsSubset(new_category_name, self.new_category1['name'])
-            self.assertDictContainsSubset(new_category_description, self.new_category1['description'])
+            self.assertEquals(category_id, self.new_category1['id'])
+            self.assertEquals(new_category_name, self.new_category1['name'])
+            self.assertEquals(new_category_description, self.new_category1['description'])
     
     def test_create_existing_category(self):
         '''
@@ -160,8 +160,8 @@ class CategoryDbAPITestCase(BaseTestCase):
         '''
         print '('+self.test_create_existing_category.__name__+')', \
               self.test_create_existing_category.__doc__
-        category_id = db.create_category(self.new_category1_name, self.new_category1_description)
-        self.assertIsNone(category_id)
+        with self.assertRaises(sqlite3.IntegrityError):
+            db.create_category(self.category1_name, self.new_category1_description)
 
     def test_create_category_without_description(self):
         '''
@@ -170,7 +170,7 @@ class CategoryDbAPITestCase(BaseTestCase):
         print '('+self.test_create_category_without_description.__name__+')', \
               self.test_create_category_without_description.__doc__
 
-        category_id = db.create_category(self.new_category2_name, null)
+        category_id = db.create_category(self.new_category2_name)
         self.assertIsNotNone(category_id)
 
         #Create the SQL Statement
@@ -193,9 +193,9 @@ class CategoryDbAPITestCase(BaseTestCase):
             #Test the method
             new_category_name = row['name']
             new_category_description = row['description']
-            self.assertDictContainsSubset(category_id, self.new_category2['id'])
-            self.assertDictContainsSubset(new_category_name, self.new_category2['name'])
-            self.assertDictContainsSubset(new_category_description, self.new_category2['description'])
+            self.assertEquals(category_id, self.new_category2['id'])
+            self.assertEquals(new_category_name, self.new_category2['name'])
+            self.assertEquals(new_category_description, self.new_category2['description'])
 
 if __name__ == '__main__':
     print 'Start running tests'

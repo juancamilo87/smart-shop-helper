@@ -4,7 +4,7 @@ import shop.database
 
 #Path to the database file, different from the deployment db
 db_path = 'db/shop_test.db'
-db = forum.database.ShopDatabase(db_path)
+db = shop.database.ShopDatabase(db_path)
 
 class BaseTestCase(unittest.TestCase):
     '''
