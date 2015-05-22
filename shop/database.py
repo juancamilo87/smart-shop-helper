@@ -294,6 +294,70 @@ class ShopDatabase(object):
                 print "Error %s:" % excp.args[0]
         return None
 
+    def get_category(self, category_id):
+        '''
+        Return a list of Categories of the database. Each category is serialized as a 
+        dictionary that contains 3 keys: the id, the name and the description.
+        Return None if the database has no categories. 
+        '''
+        #Create the SQL Statements
+        #SQL Statement for activating foreign keys
+        keys_on = 'PRAGMA foreign_keys = ON'
+          #SQL Statement for retrieving the categories
+        query = 'SELECT categories.* FROM categories WHERE category_id = ?'
+        #Connects to the database. Gets a connection object
+
+
+        con = sqlite3.connect(self.db_path)
+        with con:
+            #Cursor and row initialization
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            #Provide support for foreign keys
+            cur.execute(keys_on)        
+            #Execute main SQL Statement
+            pvalue = (category_id,)
+            cur.execute(query, pvalue)
+            #Process the results
+            row = cur.fetchone()
+            if row is None:
+                raise ValueError("The category does not exist")
+
+            
+            return self._create_categories_object(row)
+
+    def get_category_by_name(self, category_name):
+        '''
+        Return a list of Categories of the database. Each category is serialized as a 
+        dictionary that contains 3 keys: the id, the name and the description.
+        Return None if the database has no categories. 
+        '''
+        #Create the SQL Statements
+        #SQL Statement for activating foreign keys
+        keys_on = 'PRAGMA foreign_keys = ON'
+          #SQL Statement for retrieving the categories
+        query = 'SELECT categories.* FROM categories WHERE name like ?'
+        #Connects to the database. Gets a connection object
+
+
+        con = sqlite3.connect(self.db_path)
+        with con:
+            #Cursor and row initialization
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            #Provide support for foreign keys
+            cur.execute(keys_on)        
+            #Execute main SQL Statement
+            pvalue = (category_name,)
+            cur.execute(query, pvalue)
+            #Process the results
+            row = cur.fetchone()
+            if row is None:
+                return None
+
+            
+            return self._create_categories_object(row)
+
     def get_categories(self):
         '''
         Return a list of Categories of the database. Each category is serialized as a 
@@ -341,6 +405,42 @@ class ShopDatabase(object):
                 'name':row['name'],
                 'description':row['description']}
 
+    def get_item(self, item_id):
+        '''
+        Return a list of items for a category of the database. Each item is serialized as a 
+        dictionary that contains 4 keys: the id, the name, the category id, and the description.
+        Return None if the database has no items for the category.
+        raises ValueError if the category id given does not exist
+        '''
+
+        match = re.match(r'itm-(\d{1,})', item_id)
+        if match is None:
+            raise ValueError("The item_id is malformed")
+        item_id = int(match.group(1))
+        #Create the SQL Statements
+        #SQL Statement for activating foreign keys
+        keys_on = 'PRAGMA foreign_keys = ON'
+          #SQL Statement for retrieving the categories
+        query2 = 'SELECT * FROM items \
+                    WHERE item_id = ?'
+        #Connects to the database. Gets a connection object
+        con = sqlite3.connect(self.db_path)
+        with con:
+            #Cursor and row initialization
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            #Provide support for foreign keys
+            cur.execute(keys_on)        
+            #Execute main SQL Statement
+            pvalue = (item_id,)
+            cur.execute(query2, pvalue)
+            #Process the results
+            row = cur.fetchone()
+            if row is None:
+                raise ValueError("The item does not exist")
+
+            return self._create_items_object(row)
+
     def get_items(self, category_id):
         '''
         Return a list of items for a category of the database. Each item is serialized as a 
@@ -367,7 +467,7 @@ class ShopDatabase(object):
             #Provide support for foreign keys
             cur.execute(keys_on)        
             #Execute main SQL Statement
-            pvalue = (category_id)
+            pvalue = (category_id,)
             cur.execute(query1, pvalue)
             #Process the results
             rows = cur.fetchall()
@@ -403,6 +503,66 @@ class ShopDatabase(object):
                 'category_id':row['category_id'],
                 'description':row['descr_item']}
 
+    def delete_item(self, item_id):
+        
+        match = re.match(r'itm-(\d{1,})', item_id)
+        if match is None:
+            raise ValueError("The item_id is malformed")
+        item_id = int(match.group(1))
+        #Create the SQL Statements
+        #SQL Statement for activating foreign keys
+        keys_on = 'PRAGMA foreign_keys = ON'
+          #SQL Statement for retrieving the categories
+        query = 'DELETE FROM items \
+                    WHERE item_id = ?'
+        #Connects to the database. Gets a connection object
+        con = sqlite3.connect(self.db_path)
+        with con:
+            #Cursor and row initialization
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            #Provide support for foreign keys
+            cur.execute(keys_on)        
+            #Execute main SQL Statement
+            pvalue = (item_id,)
+            cur.execute(query, pvalue)
+
+            if cur.rowcount < 1:
+                return False
+            #Return true if item is deleted.
+            return True
+
+    def delete_store(self, store_id):
+        
+        match = re.match(r'str-(\d{1,})', store_id)
+        if match is None:
+            raise ValueError("The store_id is malformed")
+        store_id = int(match.group(1))
+        #Create the SQL Statements
+        #SQL Statement for activating foreign keys
+        keys_on = 'PRAGMA foreign_keys = ON'
+          #SQL Statement for retrieving the categories
+        query = 'DELETE FROM stores \
+                    WHERE store_id = ?'
+        #Connects to the database. Gets a connection object
+        con = sqlite3.connect(self.db_path)
+        with con:
+            #Cursor and row initialization
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            #Provide support for foreign keys
+            cur.execute(keys_on)        
+            #Execute main SQL Statement
+            pvalue = (store_id,)
+            cur.execute(query, pvalue)
+
+            if cur.rowcount < 1:
+                return False
+            #Return true if store is deleted.
+            return True
+
+
+
     def get_prices(self, item_id):
         '''
         Return a list of prices for an item of the database. Each price is serialized as a 
@@ -410,7 +570,10 @@ class ShopDatabase(object):
         Return None if the database has no prices for the item.
         raises ValueError if the item id given does not exist
         '''
-
+        match = re.match(r'itm-(\d{1,})', item_id)
+        if match is None:
+            raise ValueError("The item_id is malformed")
+        item_id = int(match.group(1))
         
         #Create the SQL Statements
         #SQL Statement for activating foreign keys
@@ -429,10 +592,10 @@ class ShopDatabase(object):
             #Provide support for foreign keys
             cur.execute(keys_on)        
             #Execute main SQL Statement
-            pvalue = (item_id)
-            cur.execute(query1, item_id)
+            pvalue = (item_id,)
+            cur.execute(query1, pvalue)
             #Process the results
-            rows = cur.fetchall()
+            rows = cur.fetchone()
             if rows is None:
                 raise ValueError("The item does not exist")
 
@@ -467,6 +630,37 @@ class ShopDatabase(object):
                 'store_id':row['store_id'],
                 'timestamp':row['timestamp']}
 
+    def get_stores(self):
+        '''
+        Return a list of Stores of the database. Each store is serialized as a 
+        dictionary that contains 6 keys: the id, the name, the address, the latitude, the longitude and the schedule id.
+        Return None if the database has no stores. 
+        '''
+        #Create the SQL Statements
+        #SQL Statement for activating foreign keys
+        keys_on = 'PRAGMA foreign_keys = ON'
+          #SQL Statement for retrieving the categories
+        query = 'SELECT stores.* FROM stores'
+        #Connects to the database. Gets a connection object
+        con = sqlite3.connect(self.db_path)
+        with con:
+            #Cursor and row initialization
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            #Provide support for foreign keys
+            cur.execute(keys_on)        
+            #Execute main SQL Statement
+            cur.execute(query)
+            #Process the results
+            rows = cur.fetchall()
+            if rows is None:
+                return None
+            #Process the response.
+            stores = []
+            for row in rows:
+                stores.append(self._create_store_object(row))
+            return stores
+
     def get_store(self, store_id):
         '''
         Return a store of the database given its id. The store is serialized as a 
@@ -474,7 +668,10 @@ class ShopDatabase(object):
         Return None if the database has no store with this id.
         '''
 
-        
+        match = re.match(r'str-(\d{1,})', store_id)
+        if match is None:
+            raise ValueError("The store_id is malformed")
+        store_id = int(match.group(1))
         #Create the SQL Statements
         #SQL Statement for activating foreign keys
         keys_on = 'PRAGMA foreign_keys = ON'
@@ -554,6 +751,42 @@ class ShopDatabase(object):
 
             return self._create_schedule_object(row)
 
+    def get_schedule_from_details(self, monday_id, tuesday_id, wednesday_id, thursday_id, friday_id, saturday_id, sunday_id):
+
+        '''
+        Return a schedule of the database given its id. The schedule is serialized as a 
+        dictionary that contains 8 keys: the id, the monday id, the tuesday id, the wednesday id, the thursday id,
+        the friday id, the saturday id and the sunday id.
+        Return None if the database has no schedule with this id.
+        '''
+
+        
+        #Create the SQL Statements
+        #SQL Statement for activating foreign keys
+        keys_on = 'PRAGMA foreign_keys = ON'
+          #SQL Statement for retrieving the categories
+        query = 'SELECT * FROM schedules \
+                    WHERE monday_id = ? AND tuesday_id = ? AND wednesday_id = ? AND\
+                        thursday_id = ? AND friday_id = ? AND saturday_id = ? AND\
+                        sunday_id = ?'
+        #Connects to the database. Gets a connection object
+        con = sqlite3.connect(self.db_path)
+        with con:
+            #Cursor and row initialization
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            #Provide support for foreign keys
+            cur.execute(keys_on)        
+            #Execute main SQL Statement
+            pvalue = (monday_id, tuesday_id, wednesday_id, thursday_id, friday_id, saturday_id, sunday_id)
+            cur.execute(query, pvalue)
+            #Process the results
+            row = cur.fetchone()
+            if row is None:
+                return None
+
+            return row['schedule_id']
+
     def _create_schedule_object(self, row):
         '''
         It takes a database Row and transform it into a python dictionary.
@@ -611,6 +844,38 @@ class ShopDatabase(object):
                 return None
 
             return self._create_time_object(row)
+
+    def get_time_from_details(self, open, close):
+        '''
+        Return a time of the database given its id. The time is serialized as a 
+        dictionary that contains 3 keys: the id, the opening time and the closing time.
+        Return None if the database has no time with this id.
+        '''
+
+        
+        #Create the SQL Statements
+        #SQL Statement for activating foreign keys
+        keys_on = 'PRAGMA foreign_keys = ON'
+          #SQL Statement for retrieving the categories
+        query = 'SELECT * FROM times \
+                    WHERE open = ? AND close = ?'
+        #Connects to the database. Gets a connection object
+        con = sqlite3.connect(self.db_path)
+        with con:
+            #Cursor and row initialization
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            #Provide support for foreign keys
+            cur.execute(keys_on)        
+            #Execute main SQL Statement
+            pvalue = (open,close)
+            cur.execute(query, pvalue)
+            #Process the results
+            row = cur.fetchone()
+            if row is None:
+                return None
+
+            return row['time_id']
 
     def _create_time_object(self, row):
         '''
@@ -724,6 +989,16 @@ class ShopDatabase(object):
         raises ValueError if the store_id does not exist
         '''
         
+        match = re.match(r'itm-(\d{1,})', item_id)
+        if match is None:
+            raise ValueError("The item_id is malformed")
+        item_id = int(match.group(1))
+
+        match = re.match(r'str-(\d{1,})', store_id)
+        if match is None:
+            raise ValueError("The store_id is malformed")
+        store_id = int(match.group(1))
+
         #Create the SQL Statements
           #SQL Statement for activating foreign keys
         keys_on = 'PRAGMA foreign_keys = ON'
@@ -783,7 +1058,49 @@ class ShopDatabase(object):
                 cur.execute(query5, pvalue)
                 return price_id
 
+    def update_store_schedule(self, store_id, schedule_id):
+        '''
+        Create or update a price with the data provided as arguments. 
+        INPUT:    
+            - value: the item's price
+            - item_id: the identifier of the item the price belongs to
+            - store_id: the identifier of the store the price belongs to
+        OUTPUT: 
+            - returns the id of the created price
+        raises ShopDatabaseError if the database could not be modified.
+        raises ValueError if the item_id does not exist
+        raises ValueError if the store_id does not exist
+        '''
+        
 
+        match = re.match(r'str-(\d{1,})', store_id)
+        if match is None:
+            raise ValueError("The store_id is malformed")
+        store_id = int(match.group(1))
+
+        #Create the SQL Statements
+          #SQL Statement for activating foreign keys
+        keys_on = 'PRAGMA foreign_keys = ON'
+          #SQL Statement for extracting the userid given a nickname
+        query = 'UPDATE stores SET schedule_id = ? \
+                  WHERE store_id = ?'
+
+        
+        #temporal variables for messages table 
+        #timestamp will be used for lastlogin and regDate.
+        timestamp = time.mktime(datetime.now().timetuple())
+
+        #Connects to the database. Gets a connection object
+        con = sqlite3.connect(self.db_path)
+        with con:
+            #Cursor and row initialization
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            #Provide support for foreign keys
+            cur.execute(keys_on)        
+
+            pvalue = (schedule_id, store_id)
+            cur.execute(query, pvalue)
             
 
     def create_store(self, name, address, latitude, longitude, schedule_id):
