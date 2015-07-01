@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.HomeScreenActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:padding="10dp"
+        android:background="@android:color/holo_green_dark">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Smart Shop Helper"
+            style="@style/Base.TextAppearance.AppCompat.Title"
+            android:textSize="21sp"
+            android:layout_centerInParent="true"/>
+        <ImageButton
+            android:id="@+id/cart_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_shopping_cart_black_36dp"
+            android:background="@android:color/transparent"
+            android:tint="@android:color/white"/>
+    </RelativeLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Categories"
+        android:layout_margin="10dp"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        />
+    <ListView
+        android:id="@+id/list_view"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </ListView>
+    <TextView
+        android:id="@+id/empty_view"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:text="Loading categories" />
+
+
+</LinearLayout>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="#757678">
+
+    <TextView
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:id="@+id/tv_store"
+        android:text="Header"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:layout_gravity="center"
+        android:textColor="#f5c227" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:tint="@android:color/white"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_info_details"/>
+
+</LinearLayout>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:padding="10dp"
+        android:background="@android:color/holo_green_dark">
+        <ImageButton
+            android:id="@+id/back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:src="@android:drawable/ic_menu_revert"
+            android:background="@android:color/transparent"
+            android:tint="@android:color/white"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Smart Shop Helper"
+            style="@style/Base.TextAppearance.AppCompat.Title"
+            android:textSize="21sp"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+    <TextView
+        android:layout_margin="15dp"
+        android:id="@+id/store_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="Name"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Address"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:textSize="18sp"/>
+    <TextView
+        android:id="@+id/store_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="18sp"/>
+
+</LinearLayout>
