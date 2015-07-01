@@ -8,6 +8,54 @@ from geopy.distance import vincenty
 from utils import RegexConverter
 import database
 
+from datetime import timedelta
+from flask import make_response, request, current_app
+from functools import update_wrapper
+
+
+def crossdomain(origin=None, methods=None, headers=None,
+                max_age=21600, attach_to_all=True,
+                automatic_options=True):
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, basestring):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, basestring):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        if methods is not None:
+            print('got here3')
+            return methods
+
+        options_resp = current_app.make_default_options_response()
+        return options_resp.headers['allow']
+
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            if automatic_options and request.method == 'OPTIONS':
+                resp = current_app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                print('got her2e')
+                return resp
+
+            h = resp.headers
+            print('got here')
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+    return decorator
+
 
 DEFAULT_DB_PATH = 'db/shop.db'
 
@@ -52,7 +100,7 @@ def set_database():
 
 #Define the resources
 class Item(Resource):
-
+    @crossdomain(origin='*')
     def get(self, item_id):
 
         item_db = g.db.get_item(item_id)
@@ -69,7 +117,7 @@ class Item(Resource):
         theItem['prices_uri'] = api.url_for(ItemPriceList,item_id=theItem['item_id'])
 
         return Response(json.dumps(theItem), status=200)
-
+    
     def put(self, item_id):
         #CHECK THAT MESSAGE EXISTS
 
@@ -122,8 +170,7 @@ class Item(Resource):
             #template.data is not there. 
 
             abort(400)
-        
-
+    
     def delete(self, item_id):
 
         if g.db.delete_item(item_id):
@@ -134,7 +181,7 @@ class Item(Resource):
     
 
 class ItemList(Resource):
-
+    @crossdomain(origin='*')
     def get(self):
 
         categories_db = g.db.get_categories()
@@ -161,6 +208,7 @@ class ItemList(Resource):
 
         return Response(json.dumps(collection), status=200)
 
+        
     def post(self):
 
 
@@ -205,7 +253,7 @@ class ItemList(Resource):
             abort(400)
 
 class ItemPriceList(Resource): 
-
+    @crossdomain(origin='*')
     def get(self, item_id):
         '''
         Get a the item price list in the system with id item_id.
@@ -258,7 +306,7 @@ class ItemPriceList(Resource):
         return Response(json.dumps(price_list), status=200)
         
 class Store(Resource):
-
+    @crossdomain(origin='*')
     def get(self, store_id):
         '''
         Get a store in the system with id store_id.
@@ -416,10 +464,10 @@ class Store(Resource):
             return create_error_response(404,"No Store","The Store is not in the system")
 
 class StoreList(Resource):
-
     '''
     Resource StoreList implementation
     '''
+    @crossdomain(origin='*')
     def get(self):
         '''
         Get all stores in the system.
@@ -465,6 +513,7 @@ class StoreList(Resource):
         #Create the items
         stores = []
         for store in stores_db: 
+            print("Error")
             _store_id = store['id']
             _latitude = store['latitude']
             _longitude = store['longitude']
@@ -543,8 +592,10 @@ class StoreList(Resource):
                 schedule_id = g.db.get_schedule_from_details(schedule_ids[0], schedule_ids[1],schedule_ids[2], schedule_ids[3],schedule_ids[4], schedule_ids[5],schedule_ids[6])
 
                 if schedule_id is None:
-                    schedule_id = g.db.create_schedule(schedule_ids[0], schedule_ids[1],schedule_ids[2], schedule_ids[3],schedule_ids[4], schedule_ids[5],schedule_ids[6])
-
+                    schedule_id = g.db.create_schedule(schedule_ids[0], schedule_ids[1],schedule_ids[2], schedule_ids[3],schedule_ids[4], schedule_ids[5], schedule_ids[6])
+                
+                print(schedule_id)
+                
                 name = input['name']
                 address = input['address']
                 latitude = input['latitude']
@@ -552,12 +603,12 @@ class StoreList(Resource):
 
                 if not name or not address or not latitude or not longitude:
                     abort(400)
-
+                print('fds')
                 store_id = g.db.create_store(name, address, latitude, longitude, schedule_id)
 
                 if store_id is None or not store_id:
                     abort(400)
-
+                print('fds')
                 result = {}
                 result['store_uri'] = api.url_for(Store,store_id="str-"+str(store_id))
                 return Response(json.dumps(result), status=200)
@@ -567,7 +618,6 @@ class StoreList(Resource):
 
         except: 
             abort(400)
-
 
 
 #Add the Regex Converter so we can use regex expressions when we define the
@@ -591,4 +641,5 @@ api.add_resource(StoreList, '/shop/api/stores/',
 #DATABASE SHOULD HAVE BEEN POPULATED PREVIOUSLY
 if __name__ == '__main__':
     #Debug True activates automatic code reloading and improved error messages
-    app.run(debug=True)
+    #app.run(debug=True)
+    app.run(host='0.0.0.0')

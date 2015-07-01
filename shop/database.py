@@ -640,7 +640,7 @@ class ShopDatabase(object):
         #SQL Statement for activating foreign keys
         keys_on = 'PRAGMA foreign_keys = ON'
           #SQL Statement for retrieving the categories
-        query = 'SELECT stores.* FROM stores'
+        query = 'SELECT * FROM stores'
         #Connects to the database. Gets a connection object
         con = sqlite3.connect(self.db_path)
         with con:
@@ -654,11 +654,13 @@ class ShopDatabase(object):
             #Process the results
             rows = cur.fetchall()
             if rows is None:
+                print("Error")
                 return None
             #Process the response.
             stores = []
             for row in rows:
                 stores.append(self._create_store_object(row))
+            
             return stores
 
     def get_store(self, store_id):
@@ -671,6 +673,7 @@ class ShopDatabase(object):
         match = re.match(r'str-(\d{1,})', store_id)
         if match is None:
             raise ValueError("The store_id is malformed")
+        print("No error")
         store_id = int(match.group(1))
         #Create the SQL Statements
         #SQL Statement for activating foreign keys
@@ -1143,13 +1146,15 @@ class ShopDatabase(object):
 
             row = cur.fetchone()
             if row is None:
+                print("Error")
                 raise ValueError("The schedule does not exist")
 
-
-            pvalue = (name, address, latitude, longitude, schedule_id)
-            cur.execute(query2, pvalue)
             
+            pvalue2 = (name, address, latitude, longitude, schedule_id)
+            cur.execute(query2, pvalue2)
+            print("No Error")
             lid = cur.lastrowid
+            print(lid)
             return lid
 
     def create_schedule(self, monday_id, tuesday_id, wednesday_id, thursday_id, friday_id, saturday_id, sunday_id):

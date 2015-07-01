@@ -50,4 +50,10 @@ Use the files inside the folder test. There is a file for each table:
 - database_api_tests_store.py
 - database_api_tests_time.py
 
+#Setting Up and running the application.
+##STEPS:
+1. Install **geopy** on the computer which will be the server. (Command: pip install geopy). *Starting from Python versions 2.7.9 and 3.4.0, pip is already included in the regular install. If the python version is below 2.7.9, Download get-pip.py, being careful to save it as a .py file rather than .txt. Then, run it from the command prompt. Run python get-pip.py after that.*
 
+2. Download the .apk file from Client/Android Client/Installer on the android device and run it. The computer running the server and the phone must be on the same network. At the beginning, you have to provide the server ip to give access to the app. If the server ip changes, then app data has to be cleared from Android so that it asks for it again.
+
+3. For some functions, like deleting an item or a store, there is a web interface implemented in html. The jquery.js and smh.js should be in the same folder as the .html file. (All the interfaces are still not working well. Only the items could be fetched for now. On certain request types, we get the following error - No 'Access-Control-Allow-Origin' header is present on the requested resource).
