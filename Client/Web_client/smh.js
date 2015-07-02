@@ -52,7 +52,7 @@ $(function() {
 function deleteItem(item_uri){
 	//console.log(item_uri);
 	return $.ajax({
-		url: item_uri,
+		url: "http://localhost:5000"+item_uri,
 		type: "DELETE"
 	}).done(function (data, textStatus, jqXHR){
 		console.log ("RECEIVED RESPONSE: data:",data,"; textStatus:",textStatus)
