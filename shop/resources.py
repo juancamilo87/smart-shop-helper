@@ -36,8 +36,10 @@ def crossdomain(origin=None, methods=None, headers=None,
     def decorator(f):
         def wrapped_function(*args, **kwargs):
             if automatic_options and request.method == 'OPTIONS':
+                print('got options')
                 resp = current_app.make_default_options_response()
             else:
+                print('got options2')
                 resp = make_response(f(*args, **kwargs))
             if not attach_to_all and request.method != 'OPTIONS':
                 print('got her2e')
@@ -100,7 +102,7 @@ def set_database():
 
 #Define the resources
 class Item(Resource):
-    @crossdomain(origin='*')
+
     def get(self, item_id):
 
         item_db = g.db.get_item(item_id)
@@ -118,6 +120,7 @@ class Item(Resource):
 
         return Response(json.dumps(theItem), status=200)
     
+
     def put(self, item_id):
         #CHECK THAT MESSAGE EXISTS
 
@@ -170,7 +173,8 @@ class Item(Resource):
             #template.data is not there. 
 
             abort(400)
-    
+   
+    @crossdomain(origin='*')
     def delete(self, item_id):
 
         if g.db.delete_item(item_id):
@@ -179,6 +183,10 @@ class Item(Resource):
             #Send error message
             return create_error_response(404,"No Item","The Item is not in the system")
     
+    @crossdomain(origin='*')
+    def options(self, item_id):
+        return item_id
+
 
 class ItemList(Resource):
     @crossdomain(origin='*')
