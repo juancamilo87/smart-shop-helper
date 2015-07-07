@@ -71,10 +71,10 @@ Use the files inside the folder test. There is a file for each table:
 
 Resource | Path | Methods
 -------- | ---- | -------
-Item | /shop/api/items/*item_id*/ | GET, PUT, DELETE
+Item | /shop/api/items/ *item_id*/ | GET, PUT, DELETE
 ItemList | /shop/api/items/ | GET, POST
-ItemPriceList | /shop/api/items/*item_id*/pricelist/ | GET
-Store | /shop/api/stores/*store_id*/ | GET, PUT, DELETE
+ItemPriceList | /shop/api/items/ *item_id*/pricelist/ | GET
+Store | /shop/api/stores/ *store_id*/ | GET, PUT, DELETE
 StoreList | /shop/api/stores/ | GET, POST
 
 - *item_id must be in the format itm-#*  
