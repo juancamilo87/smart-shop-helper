@@ -108,6 +108,6 @@ StoreList | /shop/api/stores/ | GET, POST
 
 1. Start the server on a computer.
 2. The files jquery.js, smh.js and default.html have to be on the same folder.
-3. Open the file default.html on the same computer as the server. *If this is not possible, then change the ip from localhost to the appropiate ip in the code from the smh.js*
+3. Open the file default.html on the same computer as the server. *If this is not possible, then change the ip from localhost to the appropiate ip in the code from the smh.js.*
 
 *When an item is deleted from the Web client, the UI does not update, so a refresh has to be made and get Items should be executed again to see the change*
